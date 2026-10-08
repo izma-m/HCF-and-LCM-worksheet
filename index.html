@@ -76,13 +76,13 @@ h1{animation:rowin .8s ease both}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script></head>
 <body>
 <div class="page">
- <div class="top"><h1>HCF and LCM</h1><div>Name: <input id="nm" aria-label="Name"></div><div><button id="pdfbtn" style="display:none" onclick="savePDF()">Save as PDF</button> <span id="pdfmsg"></span></div><button id="mbtn" onclick="toggleMusic()">&#127925; Music: off</button> <div class="score" id="score">Score: 0 / 40</div></div>
+ <div class="top"><h1>HCF and LCM</h1><div>Name: <input id="nm" aria-label="Name"></div><div><button id="pdfbtn" onclick="savePDF()">Save as PDF</button> <span id="pdfmsg"></span></div><button id="mbtn" onclick="toggleMusic()">&#127925; Music: off</button> <div class="score" id="score">Score: 0 / 40</div></div>
  <p class="how"><b>Ladder method.</b> Write a prime on the left and divide the numbers beside it. For <b>LCM</b>, divide by any prime that divides at least one number (bring down the others) until every number is 1. For <b>HCF</b>, divide only by primes that divide <i>all</i> the numbers; stop when none is left. Multiply the primes you used.</p>
  <div id="qs"></div>
  <div class="endrow"><button class="go big" onclick="endWS()">End worksheet</button></div>
 </div>
 <div class="ov" id="end" role="dialog" aria-modal="true"><div class="card"><div id="endbody"></div>
-<div class="btns"><button class="go" onclick="newWS()">New worksheet</button><button id="pdfbtn2" style="display:none" onclick="savePDF()">Save as PDF</button><button onclick="closeEnd()">Keep working</button></div><div id="pdfmsg2"></div></div></div>
+<div class="btns"><button class="go" onclick="newWS()">New worksheet</button><button id="pdfbtn2" onclick="savePDF()">Save as PDF</button><button onclick="closeEnd()">Keep working</button></div><div id="pdfmsg2"></div></div></div>
 <script>
 var P=[],Q=function(t,n,lv,u,q){P.push({t:t,n:n,lv:lv,u:u,q:q||('Find the '+t+' of '+n.join(', ').replace(/, (\d+)$/,' and $1')+'.')})};
 Q('LCM',[4,6],'Level 1: Basics');Q('LCM',[6,8]);Q('LCM',[9,12]);Q('LCM',[10,15]);Q('HCF',[12,18]);Q('HCF',[16,24]);Q('HCF',[20,30]);Q('HCF',[15,25]);Q('LCM',[8,12]);Q('HCF',[14,21]);
@@ -133,11 +133,9 @@ function reset(i){var q=P[i];document.getElementById('g'+i).innerHTML=emptyRow(q
  ['m','a'].forEach(function(k){document.getElementById(k+i).value=''});
  document.getElementById('f'+i).textContent='';document.getElementById('s'+i).className='sol';res[i]=false;done[i]=0;upd()}
 
-var dl=null;
-try{claude.use('downloads').then(function(d){dl=d;if(d){document.getElementById('pdfbtn').style.display='';document.getElementById('pdfbtn2').style.display=''}}).catch(function(){})}catch(e){}
 function savePDF(){
  var m={set textContent(t){document.getElementById('pdfmsg').textContent=t;document.getElementById('pdfmsg2').textContent=t}};
- if(!dl||!window.jspdf){m.textContent='PDF saving is not available here.';return}
+ if(!window.jspdf){m.textContent='PDF library failed to load. Check your internet connection.';return}
  var doc=new jspdf.jsPDF({unit:'mm',format:'a4'}),y=22,nm=document.getElementById('nm').value.trim();
  function pg(){doc.setDrawColor(207,227,243);doc.setLineWidth(.2);for(var k=22;k<290;k+=8)doc.line(0,k,210,k);doc.setDrawColor(240,160,160);doc.line(14,0,14,297);y=22}
  function tx(t,x,c,sz,st,al){doc.setTextColor(c[0],c[1],c[2]);doc.setFont('helvetica',st||'normal');doc.setFontSize(sz||11);doc.text(String(t),x,y+6,{align:al||'left'})}
@@ -163,7 +161,7 @@ function savePDF(){
   y+=16;
  });
  var fn='HCF-LCM-worksheet'+(nm?'-'+nm.replace(/[^\w-]+/g,'-'):'')+'.pdf';
- dl.save({filename:fn,data:doc.output('blob')}).then(function(){m.textContent='Saved.'}).catch(function(e){m.textContent=e&&e.code=='declined'?'Save cancelled.':'Could not save the PDF.'});
+ doc.save(fn);m.textContent='Saved.';
 }
 
 function pop(){var e=document.getElementById('score');e.classList.remove('pop');void e.offsetWidth;e.classList.add('pop')}
